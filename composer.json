@@ -1,0 +1,33 @@
+{
+    "name": "rhdc/akamai-hosted-middleware",
+    "description": "HTTP client middlewares for Akamai-hosted sites",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Shawn Iwinski",
+            "email": "siwinski@redhat.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+    },
+    "require-dev": {
+    },
+    "suggest": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Rhdc\\Akamai\\Hosted\\Middleware\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Rhdc\\Akamai\\Hosted\\Middleware\\Test\\": "tests"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
