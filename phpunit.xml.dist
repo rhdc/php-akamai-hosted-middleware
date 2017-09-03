@@ -14,4 +14,7 @@
             <directory>src/</directory>
         </whitelist>
     </filter>
+    <logging>
+        <log type="coverage-html" target="test-coverage-report" />
+    </logging>
 </phpunit>
