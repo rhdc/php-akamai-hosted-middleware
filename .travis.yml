@@ -1,0 +1,35 @@
+language: php
+
+sudo: false
+
+cache:
+    directories:
+        - $HOME/.composer/cache/files
+
+php:
+    - 5.4
+    - 5.5
+    - 5.6
+    - 7.0
+    - 7.1
+    - nightly
+    - hhvm
+
+env:
+    matrix:
+        - DEPENDENCIES="high"
+        - DEPENDENCIES="low"
+
+matrix:
+    allow_failures:
+        - php: hhvm
+        - php: nightly
+
+before_script:
+    - composer remove --dev --no-update friendsofphp/php-cs-fixer
+    - if [ "$DEPENDENCIES" = "low" ]; then composer update --prefer-dist --prefer-stable --prefer-lowest; fi
+    - if [ "$DEPENDENCIES" != "low" ]; then composer update --prefer-dist --prefer-stable; fi
+
+
+script:
+    - composer test
