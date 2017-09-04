@@ -1,6 +1,6 @@
 {
     "name": "rhdc/akamai-hosted-middleware",
-    "description": "PSR-7 HTTP client middlewares for Akamai-hosted sites",
+    "description": "PSR-7 HTTP client middleware for Akamai-hosted sites",
     "license": "MIT",
     "type": "library",
     "authors": [
