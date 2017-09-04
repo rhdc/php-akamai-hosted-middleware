@@ -36,7 +36,7 @@ class DebugMiddlewareTest extends TestCase
 
         // Assert pragma header
         $this->assertEquals(
-            array_merge($originalHeader, DebugMiddleware::PRAGMA_HEADERS),
+            array_merge($originalHeader, DebugMiddleware::pragmaHeaders()),
             $modifiedHeader
         );
     }

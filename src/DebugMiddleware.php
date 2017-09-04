@@ -11,7 +11,7 @@ class DebugMiddleware implements RequestMiddlewareInterface
      *
      * @var string[]
      */
-    const PRAGMA_HEADERS = [
+    protected static $pragmaHeaders = [
         'akamai-x-cache-on',
         'akamai-x-cache-remote-on',
         'akamai-x-check-cacheable',
@@ -26,6 +26,11 @@ class DebugMiddleware implements RequestMiddlewareInterface
         'akamai-x-serial-no',
     ];
 
+    public static function pragmaHeaders()
+    {
+        return static::$pragmaHeaders;
+    }
+
     /**
      * Returns a new modified request instance with Akamai debug pragma headers
      *
@@ -35,6 +40,6 @@ class DebugMiddleware implements RequestMiddlewareInterface
      */
     public function processRequest(RequestInterface $request)
     {
-        return $request->withAddedHeader('Pragma', static::PRAGMA_HEADERS);
+        return $request->withAddedHeader('Pragma', static::$pragmaHeaders);
     }
 }
