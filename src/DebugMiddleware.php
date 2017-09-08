@@ -26,6 +26,11 @@ class DebugMiddleware implements RequestMiddlewareInterface
         'akamai-x-serial-no',
     ];
 
+    /**
+     * Returns array of Akamai debug pragma header values
+     *
+     * @return string[]
+     */
     public static function pragmaHeaders()
     {
         return static::$pragmaHeaders;
@@ -34,9 +39,15 @@ class DebugMiddleware implements RequestMiddlewareInterface
     /**
      * Returns a new modified request instance with Akamai debug pragma headers
      *
+     * - If the original request does not already have a pragma header, it will
+     *   be added with the Akamai debug values
+     * - If the original request already has (a) pragma header(s), the Akamai
+     *   debug values will be combined with the existing value(s)
+     *
      * @param RequestInterface $request Original request
      *
      * @return RequestInterface New modified request instance with Akamai debug pragma headers
+     * @uses RequestInterface::withAddedHeader()
      */
     public function processRequest(RequestInterface $request)
     {
