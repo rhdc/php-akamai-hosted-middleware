@@ -1,5 +1,7 @@
 <?php
 
+namespace Rhdc\Akamai\Hosted\Middleware\Test;
+
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\TestCase;
 use Rhdc\Akamai\Hosted\Middleware\DebugMiddleware;
@@ -12,32 +14,32 @@ class DebugMiddlewareTest extends TestCase
     public function testPragmaHeader(array $headers)
     {
         $originalRequest = new Request('GET', 'https://akamai.com', $headers);
-        $originalHeader = $originalRequest->getHeader('Pragma');
+        $modifiedRequest = (new DebugMiddleware())->processRequest($originalRequest);
 
-        $debugMiddleware = new DebugMiddleware();
-
-        $modifiedRequest = $debugMiddleware->processRequest($originalRequest);
-        $modifiedHeader = $modifiedRequest->getHeader('Pragma');
-
-        // Assert new instance
         $this->assertNotEquals(
             spl_object_hash($originalRequest),
-            spl_object_hash($modifiedRequest)
+            spl_object_hash($modifiedRequest),
+            'Modified request should be a new instance'
         );
 
-        // Assert same class
         $this->assertEquals(
             get_class($originalRequest),
-            get_class($modifiedRequest)
+            get_class($modifiedRequest),
+            'Modified request class does not match original request class'
         );
 
-        // Assert pragma header exists
-        $this->assertTrue($modifiedRequest->hasHeader('Pragma'));
+        $this->assertTrue(
+            $modifiedRequest->hasHeader('Pragma'),
+            'Modified request should have a "Pragma" header'
+        );
 
-        // Assert pragma header
         $this->assertEquals(
-            array_merge($originalHeader, DebugMiddleware::pragmaHeaders()),
-            $modifiedHeader
+            array_merge(
+                $originalRequest->getHeader('Pragma'),
+                DebugMiddleware::pragmaHeaders()
+            ),
+            $modifiedRequest->getHeader('Pragma'),
+            'Invalid modified request "Pragma" header'
         );
     }
 
