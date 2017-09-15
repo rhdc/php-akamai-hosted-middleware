@@ -6,52 +6,31 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Rhdc\Akamai\Hosted\Middleware\Exception\StagingResponseVerificationException;
-use Symfony\Component\Process\Process;
 
 class StagingMiddleware implements RequestMiddlewareInterface, ResponseMiddlewareInterface
 {
     const HEADER = 'X-Akamai-Staging';
 
-    protected static $stagingHosts = [];
-    protected $originatingHost;
+    /** @var StagingHostResolverInterface */
+    protected $stagingHostResolver;
 
-    /**
-     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
-     * @throws \Exception
-     */
-    public static function stagingHost($host)
+    public function __construct(StagingHostResolverInterface $stagingHostResolver = null)
     {
-        if (!isset(static::$stagingHosts[$host])) {
-            $process = new Process(implode(' | ', [
-                "dig '$host'",
-                'grep CNAME',
-                'grep \'akamaiedge.net\'',
-                'tail -1',
-                'awk \'{print $5}\''
-            ]));
-            $process->mustRun();
-
-            $edgeHost = trim($process->getOutput());
-            if (empty($host)) {
-                throw new \Exception(sprintf(
-                    'Akamai edge host for "%s" not found',
-                    $host
-                ));
-            }
-
-            static::$stagingHosts[$host] = str_replace(
-                'akamaiedge.net',
-                'akamaiedge-staging.net',
-                $edgeHost
-            );
-        }
-
-        return static::$stagingHosts[$host];
+        $this->setStagingHostResolver($stagingHostResolver);
     }
 
-    public static function stagingHosts()
+    public function setStagingHostResolver($stagingHostResolver)
     {
-        return static::$stagingHosts;
+        $this->stagingHostResolver = empty($stagingHostResolver)
+            ? new StagingHostResolver()
+            : $stagingHostResolver;
+
+        return $this;
+    }
+
+    public function getStagingHostResolver()
+    {
+        return $this->stagingHostResolver;
     }
 
     public function processRequest(RequestInterface $request)
@@ -59,17 +38,17 @@ class StagingMiddleware implements RequestMiddlewareInterface, ResponseMiddlewar
         $uri = $request->getUri();
         $uriHost = $uri->getHost();
 
-        if (empty($this->originatingHost)) {
-            $this->originatingHost = $uriHost;
-        } elseif ($uriHost != $this->originatingHost) {
+        if (!$this->stagingHostResolver->isResolvableHost($uriHost)) {
             return $request;
         }
+
+        $stagingHost = $this->stagingHostResolver->resolve($uriHost);
 
         return $request
             ->withHeader('Host', $uriHost)
             ->withUri(
                 // Set URI host to Akamai staging host
-                $uri->withHost(static::stagingHost($uriHost)),
+                $uri->withHost($stagingHost),
                 // Preserve `Host` header and do not overwrite from URI
                 true
             );
@@ -79,28 +58,26 @@ class StagingMiddleware implements RequestMiddlewareInterface, ResponseMiddlewar
      * @throws StagingResponseVerificationException if response can not be verified that
      *     it came from Akamai staging env
      */
-    public function processResponse(ResponseInterface $response)
+    public function processResponse(RequestInterface $request, ResponseInterface $response)
     {
-        try {
-            if (!$response->hasHeader(static::HEADER)) {
-                throw new \Exception(sprintf(
-                    'Response does not contain the "%s" header',
-                    static::HEADER
-                ));
-            }
+        $requestHost = $request->getUri()->getHost();
+        if (!$this->stagingHostResolver->isResolvableHost($requestHost)) {
+            return $response;
+        }
 
-            $xAkamaiStaging = $response->getHeader(static::HEADER)[0];
-            if (false === stripos($xAkamaiStaging, 'essl')) {
-                throw new \Exception(sprintf(
-                    '"%s" header does not contain string "ESSL" (actual value = "%s")',
-                    static::HEADER,
-                    $xAkamaiStaging
-                ));
-            }
-        } catch (\Exception $e) {
+        if (!$response->hasHeader(static::HEADER)) {
             throw new StagingResponseVerificationException(sprintf(
-                'Akamai response could not be verified that it came from staging env: %s',
-                $e->getMessage()
+                'Response does not contain the "%s" header',
+                static::HEADER
+            ));
+        }
+
+        $xAkamaiStaging = $response->getHeader(static::HEADER)[0];
+        if (false === stripos($xAkamaiStaging, 'essl')) {
+            throw new StagingResponseVerificationException(sprintf(
+                '"%s" header does not contain string "ESSL" (actual value = "%s")',
+                static::HEADER,
+                $xAkamaiStaging
             ));
         }
 
