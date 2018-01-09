@@ -5,7 +5,7 @@
     bootstrap="tests/bootstrap.php"
 >
     <testsuites>
-        <testsuite name="Akamai-hosted Middleware Test Suite">
+        <testsuite name="RHDC Akamai middleware test suite">
             <directory suffix="Test.php">tests/</directory>
         </testsuite>
     </testsuites>
