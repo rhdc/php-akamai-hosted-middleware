@@ -22,7 +22,9 @@ class AssertStagingMiddlewareTest extends TestCase
     public function testPragmaHeader(array $headers, $expectException)
     {
         if ($expectException) {
-            $this->expectException('Rhdc\Akamai\Middleware\Response\AssertStagingMiddlewareException');
+            $expectExceptionFunction = method_exists($this, 'expectException') ? 'expectException' : 'setExpectedException';
+            $this->$expectExceptionFunction('Rhdc\Akamai\Middleware\Response\AssertStagingMiddlewareException');
+
         }
 
         $originalResponse = new Response(200, $headers);
