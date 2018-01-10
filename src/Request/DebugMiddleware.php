@@ -1,17 +1,24 @@
 <?php
-
-namespace Rhdc\Akamai\Hosted\Middleware;
+/**
+ * This file is part of the RHDC Akamai middleware package.
+ *
+ * (c) Shawn Iwinski <siwinski@redhat.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+namespace Rhdc\Akamai\Middleware\Request;
 
 use Psr\Http\Message\RequestInterface;
 
-class DebugMiddleware implements RequestMiddlewareInterface
+class DebugMiddleware implements MiddlewareInterface
 {
     /**
      * Akamai debug pragma header values
      *
      * @var string[]
      */
-    protected static $pragmaHeaders = [
+    protected static $pragmaHeaders = array(
         'akamai-x-cache-on',
         'akamai-x-cache-remote-on',
         'akamai-x-check-cacheable',
@@ -24,7 +31,7 @@ class DebugMiddleware implements RequestMiddlewareInterface
         'akamai-x-get-ssl-client-session-id',
         'akamai-x-get-true-cache-key',
         'akamai-x-serial-no',
-    ];
+    );
 
     /**
      * Returns array of Akamai debug pragma header values
@@ -41,15 +48,14 @@ class DebugMiddleware implements RequestMiddlewareInterface
      *
      * - If the original request does not already have a pragma header, it will
      *   be added with the Akamai debug values
-     * - If the original request already has (a) pragma header(s), the Akamai
-     *   debug values will be combined with the existing value(s)
+     * - If the original request already has a pragma header, the Akamai debug
+     *   values will be combined with the existing value(s)
      *
      * @param RequestInterface $request Original request
      *
      * @return RequestInterface New modified request instance with Akamai debug pragma headers
-     * @uses RequestInterface::withAddedHeader()
      */
-    public function processRequest(RequestInterface $request)
+    public function __invoke(RequestInterface $request)
     {
         return $request->withAddedHeader('Pragma', static::$pragmaHeaders);
     }

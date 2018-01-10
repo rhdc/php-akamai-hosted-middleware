@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the RHDC Akamai middlware package.
+ * This file is part of the RHDC Akamai middleware package.
  *
  * (c) Shawn Iwinski <siwinski@redhat.com>
  *
