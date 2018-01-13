@@ -9,7 +9,7 @@
  */
 namespace Rhdc\Akamai\Middleware\Response\Test;
 
-use GuzzleHttp\Psr7\Response;
+use RingCentral\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Rhdc\Akamai\Middleware\Response\AssertStagingMiddleware;

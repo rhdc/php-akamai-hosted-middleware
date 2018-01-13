@@ -9,27 +9,22 @@
  */
 namespace Rhdc\Akamai\Middleware\Request\Test;
 
-use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Rhdc\Akamai\Middleware\Request\DebugMiddleware;
+use RingCentral\Psr7\Request;
 
 class DebugMiddlewareTest extends TestCase
 {
     /**
      * @dataProvider requestHeadersProvider
      */
-    public function testPragmaHeader(array $headers)
+    public function testMiddleware(array $headers)
     {
         $originalRequest = new Request('GET', 'https://akamai.com', $headers);
 
         $debugMiddleware = new DebugMiddleware();
         $modifiedRequest = $debugMiddleware($originalRequest);
-
-        $this->assertTrue(
-            $originalRequest instanceof RequestInterface,
-            'Modified request class is not an instance of Psr\\Http\\Message\\RequestInterface'
-        );
 
         $this->assertNotEquals(
             spl_object_hash($originalRequest),
