@@ -9,6 +9,12 @@
             "email": "siwinski@redhat.com"
         }
     ],
+    "keywords": [
+        "akamai",
+        "psr7",
+        "psr-7",
+        "middleware"
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
