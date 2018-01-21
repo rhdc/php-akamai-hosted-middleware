@@ -11,6 +11,9 @@ namespace Rhdc\Akamai\Middleware\Request;
 
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * @see https://community.akamai.com/community/web-performance/blog/2015/03/31/using-akamai-pragma-headers-to-investigate-or-troubleshoot-akamai-content-delivery
+ */
 class DebugMiddleware implements MiddlewareInterface
 {
     /**
