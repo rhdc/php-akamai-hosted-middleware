@@ -27,7 +27,6 @@ before_script:
     - if [ "$DEPENDENCIES" = "low" ]; then composer update --prefer-dist --prefer-stable --prefer-lowest; fi
     - if [ "$DEPENDENCIES" != "low" ]; then composer install --prefer-dist; fi
 
-
 script:
-    - composer check
+    - if [ "$DEPENDENCIES" != "low" ]; then composer check; fi
     - composer test
