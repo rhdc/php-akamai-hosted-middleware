@@ -23,7 +23,11 @@ class ResolverMiddlewareTest extends TestCase
     {
         // @todo Change to `NativeResolver::class` when PHP 5.3 and 5.4
         //       support is dropped
-        $this->resolver = $this->createMock('Rhdc\\Akamai\\Edge\\Resolver\\NativeResolver');
+        if (method_exists($this, 'createMock')) {
+            $this->resolver = $this->createMock('Rhdc\\Akamai\\Edge\\Resolver\\NativeResolver');
+        } else {
+            $this->resolver = $this->getMock('Rhdc\\Akamai\\Edge\\Resolver\\NativeResolver');
+        }
     }
 
     public function testConstructResolver()
